@@ -47,16 +47,14 @@ for _ in range(N):
 
 ## Estructura
 Para completar el ejercicio se tienen que seguir los siguientes pasos (Puedes usar docs o ChatGTP para informacion no incluida, researching):
-______
 
-### Preparacion
+## Preparacion
 1.  Crear una cuenta en [Google Colab](https://colab.google/), donde crearemos un cuaderno en el que trabajar con suficiente potencia
 2.  Descargar la funcion load_data() del Classroom, junto a los dataset de prueba. (Utilizaremos dataset1.csv)
 3.  Importar dichos ficheros en la raiz del sistema y conseguir realizar ```X, Y = load_data("dataset.csv")```. **No se puede copiar directamente la funcion "load_data" con CtrlC-CtrlV!** Hay que conseguir importarlo y que funcione desde este cuaderno haciendo referencia a la ubicacion del fichero.
 
-______
 
-### Creacion de Interfaz
+## Creacion de Interfaz
 1. Crear una nueva Seccion nada mas al comienzo donde estaran todos los import. Como buena practica debe seguir el siguiente orden:
 ```python
 # Primero los "from _ import _" que no sean tuyos
@@ -79,43 +77,57 @@ import mifich
 2. Crear una nueva Sección de codigo donde guardaremos las variables mutables. Es decir aquellas variables que podemos cambiar para definir el comportamiento del sistema. (ej: num. de iteraciones). Es tu laboratorio de variables
 
 3. Crear una nueva Seccion de inicializacion de variables o constantes no mutables (ej: arr = []), es opcional.
-______
 
-### Ejecucion y Analisis
+## Ejecucion y Analisis
 La seccion final del programa sera nuestro programa principal (aprovechando las funciones que definimos mas adelante). Esta debe:
 - Leer un dataset dado en la seccion de variables mutables
 - Crear un modelo SVC con kernel lineal o sigmoid desde `sklearn.svm` (tambien elegido en variables mutables)
 - Crear un preprocesador `MinMaxScaler` o `StandardScaler` de `sklearn.preprocessing` (same con this)
 - Imprimir una tabla y grafica con el comportamiento del modelo a lo largo de 10 iteraciones distintas
 
-______
 
-### Definicion de Funciones:
+## Definicion de Funciones:
 Empezamos a codear. **(Consejo, no tipes las variables hasta que no sepas que son)**:
 
+
+```python
+def train(...):
+  # Crear una semilla
+  # Particionar los datos
+  # Preprocesar datos
+  # Entrenamos modelo
+```
 1. Definiremos una funcion `train(model, X, Y, split_size, preprocessor)` (donde split_size y preprocessor son opcionales):
-
-  - Crea una semilla aleatoria con `random.randint()` de la libreria `random`. Este sera nuestro numero aleatorio para tener ejecuciones distintas
-  - Ahora podemos particionar el conjunto de datos X, Y utilizando la siguiente funcion:
-  ```python
-  # De sklearn.model_selection
-  X_train, X_test, Y_train, Y_test = train_test_split( X, Y, split_size, random_state)
-  ```
-
-  - Si es necesario (parametro opcional), agregaremos al modelo nuestro preprocesador con `pipe = make_pipeline(preprocessor, model)` con la libreria `sklearn.pipeline`. Notita extra: Con esta funcion tambien se podrian encadenar preprocessors entre si.
+  - Crearemos la semilla aleatoria con `random.randint()` de la libreria random. Este sera nuestro numero aleatorio para tener ejecuciones distintas
+  - Particionamos el conjunto de datos X, Y utilizando `X_train, X_test, Y_train, Y_test = train_test_split( X, Y, split_size, random_state)` de sklearn.model_selection
+  - Si es necesario (parametro opcional, ejem ejem, pista), agregaremos al modelo nuestro preprocesador con `pipe = make_pipeline(preprocessor, model)` con la libreria sklearn.pipeline. Notita extra: Con esta funcion tambien se podrian encadenar preprocessors entre si.
   - Utilizamos la funcion `model.fit(x,y)` para entrenar a nuestro modelo con el conjunto de datos.
 
-Resumen: Crea una semilla, particiona los datos, preprocesalos y entrena al modelo con esos datos.
+Pregunta : ¿Por que particionamos X e Y? ¿Que pasaria si no lo hiciesemos?
 
-Pregunta: ¿Por que particionamos X e Y? ¿Que pasaria si no lo hiciesemos?
 Pregunta 2: Probablemente model.fit no te aparezca como funcion en el IDE. ¿Sabrias decir por que?
 
-2. Definiremos una nueva funcion `eval_predict(model, X, Y)` que sera nuestra funcion de "evaluacion de modelo". Retornara un diccionario con los siguientes elementos:
-  - **'prediction'**: Salida de `model.predict(X)`
-  - **'accuracy'**: Salida de `accuracy_score(y_real, y_pred)` de `sklearn.metrics`
-  - **'precission'**: Salida de `precision_score(y_real, y_pred, average='weighted', zero_division=0)` de `sklearn.metrics`
 
-3. Definiremos una funcion `eval_in_batch(model, X, Y, split_size, iter, preprocessor)` que evaluara el comportamiento del modelo, pero esta vez con `iter` iteraciones. Tras haberlas realizado:
+```python
+def eval_predict(...):
+  # Predecir X
+  # Medir/Evaluar Prediccion
+  # Generar resultados
+```
+2. Definiremos una nueva funcion `eval_predict(model, X, Y)` que sera nuestra funcion de "evaluacion de modelo". Retornara un diccionario:
+  Los resultados a devolver son:
+  - **'prediction'**: Salida de `model.predict(X)`
+  - **'accuracy'**: Salida de `accuracy_score(y_real, y_pred)` de sklearn.metrics
+  - **'precission'**: Salida de `precision_score(y_real, y_pred, average='weighted', zero_division=0)` de sklearn.metrics
+
+
+```python
+def eval_in_batch(...) -> pd.DataFrame:
+  # Procesar <iter> veces nuestro modelo (entrenamiento + prediccion)
+  # Generar resultados
+```
+3. Definiremos una funcion `eval_in_batch(model, X, Y, split_size, iter, preprocessor)` que evaluara el comportamiento del modelo, pero esta vez con `iter` iteraciones.
+
   - Debe retornar un pandas DataFrame con la informacion de todas las ejecuciones **(entrenamiento + prediccion)**. Pandas es una libreria estandarizada a dia de hoy para trabajar con conjuntos de datos, puedes usarla tal que:
   ```python
   import pandas as pd
@@ -131,18 +143,23 @@ Pregunta 2: Probablemente model.fit no te aparezca como funcion en el IDE. ¿Sab
   print(df)
   ```
   - Asegurate de que los valores del df esten redondeados a 3 decimales
-  - Asegurate de medir los tiempos de entrenamiento utilizando `t = time.time()` para comenzar un reloj y `time.time() - t` para terminarlo. Nota: La libreria es `time`
+  - Asegurate de medir los tiempos de entrenamiento utilizando `t = time.time()` para comenzar un reloj y `time.time() - t` para terminarlo. Nota: La libreria es time
 
+
+```python
+def plot_results(...):
+  # Grafica los resultados
+```
 4. Definiremos una funcion `plot_results` que utilizara graficara el tiempo de ejecucion comportamiento (variables a elegir). Como ejemplo de como plottear y manejar df's puedes ver el siguiente ejemplo:
+
 ```python
 df[['ColA', 'ColB']].plot(kind='line')  # Also can use kind='bar'
 plt.xlabel(...)
 plt.title(...)
 plt.show()
 ```
-______
-### Bonus
-Agrega una barra de carga mientras el modelo esta entrenando usando (truco pro) la libreria `tqdm`
+## Bonus
+Agrega una barra de carga mientras el modelo esta entrenando usando (truco pro) la libreria tqdm
 ```python
 from tqdm import tqdm
 # Ejemplo 1
